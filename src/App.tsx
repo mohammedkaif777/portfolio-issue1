@@ -79,7 +79,7 @@ export default function App() {
   const isMarvel = theme === 'marvel';
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
+    <div className={`min-h-screen overflow-x-hidden transition-colors duration-300 ${
       isMarvel ? 'halftone-marvel text-comic-ink' : 'halftone-dc text-dc-chalk'
     }`}>
       

@@ -116,7 +116,7 @@ export const SecretComms: React.FC<SecretCommsProps> = ({ theme, onTriggerDecal,
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g. Commander Sarah / Tech Lead Alex"
-                  className="w-full border-3 border-comic-ink bg-comic-paper text-comic-ink p-3 rounded-lg font-comic font-bold text-sm shadow-comic-sm focus:outline-none focus:ring-2 focus:ring-marvel-red"
+                  className="w-full border-3 border-comic-ink bg-comic-paper text-comic-ink p-3 rounded-lg font-comic font-bold text-base shadow-comic-sm focus:outline-none focus:ring-2 focus:ring-marvel-red"
                 />
               </div>
 
@@ -131,7 +131,7 @@ export const SecretComms: React.FC<SecretCommsProps> = ({ theme, onTriggerDecal,
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="e.g. alex@enterprise.com"
-                  className="w-full border-3 border-comic-ink bg-comic-paper text-comic-ink p-3 rounded-lg font-comic font-bold text-sm shadow-comic-sm focus:outline-none focus:ring-2 focus:ring-marvel-red"
+                  className="w-full border-3 border-comic-ink bg-comic-paper text-comic-ink p-3 rounded-lg font-comic font-bold text-base shadow-comic-sm focus:outline-none focus:ring-2 focus:ring-marvel-red"
                 />
               </div>
 
@@ -143,7 +143,7 @@ export const SecretComms: React.FC<SecretCommsProps> = ({ theme, onTriggerDecal,
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full border-3 border-comic-ink bg-comic-paper text-comic-ink p-3 rounded-lg font-comic font-bold text-sm shadow-comic-sm focus:outline-none focus:ring-2 focus:ring-marvel-red"
+                  className="w-full border-3 border-comic-ink bg-comic-paper text-comic-ink p-3 rounded-lg font-comic font-bold text-base shadow-comic-sm focus:outline-none focus:ring-2 focus:ring-marvel-red"
                 >
                   <option value="Java & Spring Boot Microservices">Java & Spring Boot Microservices (AWS)</option>
                   <option value="Gen AI & LLM Systems">Generative AI & LLM Agentic Workflows</option>
@@ -164,7 +164,7 @@ export const SecretComms: React.FC<SecretCommsProps> = ({ theme, onTriggerDecal,
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="Detail your project goals, architectural challenge, or role briefing..."
-                  className="w-full border-3 border-comic-ink bg-comic-paper text-comic-ink p-3 rounded-lg font-comic font-bold text-sm shadow-comic-sm focus:outline-none focus:ring-2 focus:ring-marvel-red"
+                  className="w-full border-3 border-comic-ink bg-comic-paper text-comic-ink p-3 rounded-lg font-comic font-bold text-base shadow-comic-sm focus:outline-none focus:ring-2 focus:ring-marvel-red"
                 />
               </div>
 

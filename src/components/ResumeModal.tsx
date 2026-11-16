@@ -87,8 +87,9 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose, theme
                 soundFx.playClick();
                 onClose();
               }}
-              className="comic-btn p-1.5 border-3 border-comic-ink bg-red-500 text-white shadow-comic-sm hover:bg-black"
+              className="comic-btn min-h-[38px] min-w-[38px] flex items-center justify-center p-2 border-2 sm:border-3 border-comic-ink bg-red-500 text-white shadow-comic-sm hover:bg-black"
               title="Close Modal"
+              aria-label="Close Resume Modal"
             >
               <X className="w-5 h-5" />
             </button>

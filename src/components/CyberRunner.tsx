@@ -72,7 +72,7 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
     canDoubleJump: true,
     capeWave: 0,
     groundY: 240,
-    speed: 4.5,
+    speed: 4.8,
     obstacles: [] as Obstacle[],
     collectibles: [] as Collectible[],
     floatingTexts: [] as FloatingText[],
@@ -86,7 +86,7 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
     lastTime: 0,
   });
 
-  // Jump Action
+  // Jump Action (Keyboard & Touch)
   const handleJump = useCallback(() => {
     const e = engineRef.current;
     if (gameState !== 'playing') {
@@ -97,28 +97,34 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
     }
 
     if (e.isGrounded) {
-      e.heroVY = -12;
+      e.heroVY = -12.5;
       e.isGrounded = false;
       e.canDoubleJump = true;
       soundFx.playJump();
       onTriggerDecal('JUMP!');
     } else if (e.canDoubleJump) {
-      e.heroVY = -10.5;
+      e.heroVY = -11;
       e.canDoubleJump = false;
       soundFx.playDoubleJump();
-      onTriggerDecal('AIR LIFT!');
+      onTriggerDecal('DOUBLE JUMP!');
       e.floatingTexts.push({
         x: 80,
         y: e.heroY - 10,
-        text: 'DOUBLE JUMP!',
-        color: '#00F0FF',
+        text: 'AIR LIFT!',
+        color: '#FFD200',
         alpha: 1,
         vy: -2,
       });
     }
   }, [gameState, onTriggerDecal]);
 
-  // Keyboard controls
+  // Touch on Canvas Handler (prevents mobile page scroll during gameplay)
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    handleJump();
+  };
+
+  // Keyboard Controls
   useEffect(() => {
     const onKeyDown = (evt: KeyboardEvent) => {
       if (evt.code === 'Space' || evt.code === 'ArrowUp') {
@@ -151,7 +157,7 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
     setInvincibleLeft(0);
     setGameState('playing');
     soundFx.playClick();
-    onTriggerDecal('MISSION START!');
+    onTriggerDecal('SPRINT STARTED!');
   };
 
   // Main Canvas Render Loop
@@ -163,7 +169,7 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
 
     let isRunning = true;
 
-    const loop = (timestamp: number) => {
+    const loop = () => {
       if (!isRunning) return;
 
       const e = engineRef.current;
@@ -174,7 +180,7 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
       // Clear Canvas
       ctx.clearRect(0, 0, width, height);
 
-      // 1. Draw Parallax Background (Cyber Mumbai Underworld)
+      // 1. Draw Parallax Background
       e.bgOffset = (e.bgOffset + (gameState === 'playing' ? e.speed * 0.4 : 0.8)) % width;
 
       // Sky Gradient
@@ -268,7 +274,7 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
               particleCount: 80,
               spread: 70,
               origin: { y: 0.6 },
-              colors: ['#FF007F', '#00F0FF', '#FFE600', '#F59E0B'],
+              colors: ['#E62429', '#FFD200', '#0266B3', '#F5A623'],
             });
           }
         }
@@ -304,12 +310,11 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
         if (e.collectibleTimer <= 0) {
           e.collectibleTimer = Math.floor(Math.random() * 60) + 70;
           const collectibleTypes = [
-            { type: 'token' as const, value: 50, label: '+50 AI TOKEN', color: '#00F0FF', w: 22, h: 22 },
-            { type: 'gem' as const, value: 100, label: '+100 CLEAN CODE', color: '#FFE600', w: 22, h: 22 },
-            { type: 'coffee' as const, value: 0, label: 'COFFEE SHIELD!', color: '#F59E0B', w: 24, h: 24 },
+            { type: 'token' as const, value: 50, label: '+50 AI TOKEN', color: '#00D2FF', w: 22, h: 22 },
+            { type: 'gem' as const, value: 100, label: '+100 CLEAN CODE', color: '#FFD200', w: 22, h: 22 },
+            { type: 'coffee' as const, value: 0, label: 'COFFEE SHIELD!', color: '#F5A623', w: 24, h: 24 },
           ];
           const choice = collectibleTypes[Math.floor(Math.random() * collectibleTypes.length)];
-          // Float height (high or mid)
           const floatY = e.groundY - (Math.random() > 0.5 ? 90 : 50);
           e.collectibles.push({
             x: width + 30,
@@ -328,7 +333,6 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
           const obs = e.obstacles[i];
           obs.x -= e.speed;
 
-          // Hero Hitbox
           const heroBox = { x: 80, y: e.heroY, w: e.heroWidth, h: e.heroHeight };
           const obsBox = { x: obs.x, y: obs.y, w: obs.width, h: obs.height };
 
@@ -340,25 +344,22 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
 
           if (isColliding) {
             if (e.invincibleTimer > 0) {
-              // Destroy obstacle during invincibility
               soundFx.playHit();
               e.floatingTexts.push({
                 x: obs.x,
                 y: obs.y - 15,
                 text: 'CRUSHED!',
-                color: '#FFE600',
+                color: '#FFD200',
                 alpha: 1,
                 vy: -2,
               });
               e.obstacles.splice(i, 1);
               continue;
             } else {
-              // Game Over
               soundFx.playHit();
               setGameState('gameover');
               onTriggerDecal('CRASH! GAME OVER');
 
-              // Update High Score
               const finalScore = e.currentScore;
               const savedHS = parseInt(localStorage.getItem('lotc_high_score') || '0', 10);
               if (finalScore > savedHS) {
@@ -369,7 +370,6 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
             }
           }
 
-          // Remove offscreen
           if (obs.x + obs.width < -30) {
             e.obstacles.splice(i, 1);
           }
@@ -391,7 +391,7 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
 
           if (isCollected) {
             if (col.type === 'coffee') {
-              e.invincibleTimer = 300; // 5 seconds at 60fps
+              e.invincibleTimer = 300;
               soundFx.playBoost();
               onTriggerDecal('SUPERCHARGED!');
             } else {
@@ -424,13 +424,10 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
       e.collectibles.forEach((col) => {
         ctx.save();
         ctx.translate(col.x + col.width / 2, col.y + col.height / 2);
-        
-        // Glow
         ctx.shadowColor = col.color;
         ctx.shadowBlur = 10;
 
         if (col.type === 'token') {
-          // AI Token / GPU Diamond
           ctx.fillStyle = col.color;
           ctx.strokeStyle = '#000000';
           ctx.lineWidth = 2;
@@ -443,14 +440,12 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
           ctx.fill();
           ctx.stroke();
 
-          // Symbol
           ctx.fillStyle = '#000000';
           ctx.font = 'bold 9px "Press Start 2P"';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText('AI', 0, 1);
         } else if (col.type === 'gem') {
-          // Clean Code Gem
           ctx.fillStyle = col.color;
           ctx.strokeStyle = '#000000';
           ctx.lineWidth = 2;
@@ -465,7 +460,6 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
           ctx.textBaseline = 'middle';
           ctx.fillText('⚡', 0, 1);
         } else if (col.type === 'coffee') {
-          // Coffee Cup
           ctx.fillStyle = col.color;
           ctx.strokeStyle = '#000000';
           ctx.lineWidth = 2;
@@ -488,7 +482,6 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 3;
 
-        // Spikes shape
         ctx.beginPath();
         ctx.moveTo(obs.x, obs.y + obs.height);
         ctx.lineTo(obs.x + obs.width / 2, obs.y);
@@ -497,7 +490,6 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
         ctx.fill();
         ctx.stroke();
 
-        // Label Tag
         ctx.fillStyle = '#000000';
         ctx.font = 'bold 8px "Comic Neue", sans-serif';
         ctx.textAlign = 'center';
@@ -565,7 +557,7 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
 
       ctx.restore();
 
-      // 6. Floating Action Texts ("+50", "POW!", "DOUBLE JUMP!")
+      // 6. Floating Action Texts
       for (let i = e.floatingTexts.length - 1; i >= 0; i--) {
         const ft = e.floatingTexts[i];
         ft.y += ft.vy;
@@ -586,7 +578,6 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
         }
       }
 
-      // Next Animation Frame
       e.animFrameId = requestAnimationFrame(loop);
     };
 
@@ -599,30 +590,30 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
   }, [gameState, isMarvel, unlockedGoldBadge, onTriggerDecal]);
 
   return (
-    <section id="arcade" className="py-12">
+    <section id="arcade" className="py-8 sm:py-12">
       
       {/* Title Bar */}
-      <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-4 border-comic-ink pb-4">
+      <div className="mb-4 sm:mb-6 flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4 border-b-4 border-comic-ink pb-3 sm:pb-4">
         <div>
-          <div className="inline-flex items-center gap-2 border-2 border-comic-ink bg-emerald-400 text-comic-ink font-bangers text-sm px-3 py-0.5 shadow-comic-sm uppercase">
-            <Gamepad2 className="w-4 h-4" />
+          <div className="inline-flex items-center gap-2 border-2 border-comic-ink bg-emerald-400 text-comic-ink font-bangers text-xs sm:text-sm px-2.5 sm:px-3 py-0.5 shadow-comic-sm uppercase">
+            <Gamepad2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>CHAPTER FOUR • THE ARCADE PAVILION</span>
           </div>
-          <h2 className="font-bangers text-4xl sm:text-6xl tracking-wide mt-2">
+          <h2 className="font-bangers text-3xl sm:text-5xl md:text-6xl tracking-wide mt-1.5 leading-tight">
             CYBER-RUNNER: LORDS OF THE CODES
           </h2>
         </div>
 
         {/* Live Scoreboard HUD */}
-        <div className="flex items-center gap-3">
-          <div className="border-3 border-comic-ink bg-comic-paper text-comic-ink px-4 py-1.5 rounded-lg shadow-comic-sm font-arcade text-xs">
-            <span className="block text-[9px] text-gray-600">CURRENT SCORE</span>
-            <span className="text-xl text-marvel-red font-bold">{score}</span>
+        <div className="flex items-center gap-2 sm:gap-3 self-start md:self-auto">
+          <div className="border-2 sm:border-3 border-comic-ink bg-comic-paper text-comic-ink px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg shadow-comic-sm font-arcade text-xs">
+            <span className="block text-[8px] sm:text-[9px] text-gray-600">CURRENT</span>
+            <span className="text-base sm:text-xl text-marvel-red font-bold">{score}</span>
           </div>
 
-          <div className="border-3 border-comic-ink bg-marvel-yellow text-comic-ink px-4 py-1.5 rounded-lg shadow-comic-sm font-arcade text-xs">
-            <span className="block text-[9px] text-gray-700">RECORD HIGH</span>
-            <span className="text-xl text-comic-ink font-bold">{highScore}</span>
+          <div className="border-2 sm:border-3 border-comic-ink bg-marvel-yellow text-comic-ink px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg shadow-comic-sm font-arcade text-xs">
+            <span className="block text-[8px] sm:text-[9px] text-gray-700">RECORD</span>
+            <span className="text-base sm:text-xl text-comic-ink font-bold">{highScore}</span>
           </div>
         </div>
       </div>
@@ -634,47 +625,49 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
           isMarvel ? 'bg-white' : 'bg-dc-card'
         }`}
       >
-        {/* Game Canvas */}
+        {/* Game Canvas with touch-action: none to allow touch jumps without scrolling */}
         <canvas
           ref={canvasRef}
           width={800}
           height={320}
           onClick={handleJump}
-          className="w-full h-auto max-h-[360px] rounded-xl border-4 border-comic-ink bg-black block cursor-pointer select-none"
+          onTouchStart={handleTouchStart}
+          style={{ touchAction: 'none' }}
+          className="w-full h-auto max-h-[360px] rounded-xl border-3 sm:border-4 border-comic-ink bg-black block cursor-pointer select-none"
         />
 
         {/* Invincibility HUD Badge */}
         {invincibleLeft > 0 && (
-          <div className="absolute top-6 left-6 z-10 border-3 border-comic-ink bg-neon-yellow text-comic-ink font-bangers text-lg px-4 py-1 shadow-comic animate-bounce">
-            ☕ COFFEE SHIELD ACTIVE: {invincibleLeft}s
+          <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-10 border-2 sm:border-3 border-comic-ink bg-marvel-yellow text-comic-ink font-bangers text-sm sm:text-lg px-2.5 sm:px-4 py-1 shadow-comic animate-bounce">
+            ☕ COFFEE SHIELD: {invincibleLeft}s
           </div>
         )}
 
         {/* Overlay Screen: Idle / Start */}
         {gameState === 'idle' && (
-          <div className="absolute inset-0 bg-black/75 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-20">
-            <div className="border-4 border-comic-ink bg-comic-paper text-comic-ink p-6 rounded-2xl shadow-comic-lg max-w-md space-y-4">
-              <span className="font-arcade text-xs text-neon-magenta block">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 text-center z-20">
+            <div className="border-3 sm:border-4 border-comic-ink bg-comic-paper text-comic-ink p-4 sm:p-6 rounded-2xl shadow-comic-lg max-w-md space-y-3 sm:space-y-4">
+              <span className="font-arcade text-[10px] sm:text-xs text-marvel-red block">
                 RETRO 2D COMIC RUNNER
               </span>
-              <h3 className="font-bangers text-4xl leading-none">
+              <h3 className="font-bangers text-3xl sm:text-4xl leading-tight">
                 CYBER-RUNNER: LORDS OF THE CODES
               </h3>
-              <p className="font-comic font-bold text-sm text-gray-700">
-                Sprint across Mumbai's digital underworld! Dodge 404/500 bugs, collect AI compute units, and grab coffee boosts.
+              <p className="font-comic font-bold text-xs sm:text-sm text-gray-700">
+                Sprint across Mumbai's digital underworld! Dodge 404/500 bugs, collect AI tokens, and reach 300+ points!
               </p>
               
-              <div className="bg-gray-100 border-2 border-comic-ink p-2.5 rounded font-comic text-xs space-y-1">
-                <div>⌨️ <span className="font-bold">SPACEBAR / UP ARROW</span> or <span className="font-bold">TAP</span> = Jump & Double-Jump</div>
-                <div>🏆 <span className="font-bold">Reach 300+ Points</span> to unlock the Supreme Code Lord Badge!</div>
+              <div className="bg-gray-100 border-2 border-comic-ink p-2 sm:p-2.5 rounded font-comic text-[11px] sm:text-xs space-y-1">
+                <div>⌨️ <strong>SPACE / UP ARROW</strong> or <strong>TAP SCREEN</strong> = Jump & Double-Jump</div>
+                <div>🏆 <strong>Reach 300+ Points</strong> = Unlock Gold Badge!</div>
               </div>
 
               <button
                 onClick={startGame}
-                className="comic-btn w-full py-3 border-4 border-comic-ink bg-neon-cyan text-comic-ink font-bangers text-2xl shadow-comic hover:bg-neon-yellow transition-all flex items-center justify-center gap-2"
+                className="comic-btn w-full py-2.5 sm:py-3 border-3 sm:border-4 border-comic-ink bg-marvel-yellow text-comic-ink font-bangers text-xl sm:text-2xl shadow-comic hover:bg-white transition-all flex items-center justify-center gap-2"
               >
-                <Play className="w-6 h-6 fill-current" />
-                <span>START SPRINT [SPACE]</span>
+                <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
+                <span>START SPRINT [TAP]</span>
               </button>
             </div>
           </div>
@@ -682,72 +675,79 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
 
         {/* Overlay Screen: Game Over */}
         {gameState === 'gameover' && (
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-20">
-            <div className="border-4 border-comic-ink bg-comic-paper text-comic-ink p-6 rounded-2xl shadow-comic-lg max-w-md space-y-4">
-              <div className="border-2 border-comic-ink bg-red-500 text-white font-bangers text-lg px-3 py-0.5 shadow-comic-sm inline-block">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 text-center z-20">
+            <div className="border-3 sm:border-4 border-comic-ink bg-comic-paper text-comic-ink p-4 sm:p-6 rounded-2xl shadow-comic-lg max-w-md space-y-3 sm:space-y-4">
+              <div className="border-2 border-comic-ink bg-red-500 text-white font-bangers text-base sm:text-lg px-3 py-0.5 shadow-comic-sm inline-block">
                 💥 PRODUCTION OUTAGE! 💥
               </div>
-              <h3 className="font-bangers text-5xl text-comic-ink leading-none">
+              <h3 className="font-bangers text-4xl sm:text-5xl text-comic-ink leading-none">
                 MISSION FAILED
               </h3>
               
-              <div className="grid grid-cols-2 gap-3 py-1 font-arcade">
-                <div className="border-2 border-comic-ink p-2 rounded bg-gray-100">
-                  <span className="text-[9px] text-gray-600 block">SCORE</span>
-                  <span className="text-xl text-neon-magenta font-bold">{score}</span>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 py-1 font-arcade">
+                <div className="border-2 border-comic-ink p-1.5 sm:p-2 rounded bg-gray-100">
+                  <span className="text-[8px] sm:text-[9px] text-gray-600 block">SCORE</span>
+                  <span className="text-lg sm:text-xl text-marvel-red font-bold">{score}</span>
                 </div>
-                <div className="border-2 border-comic-ink p-2 rounded bg-gray-100">
-                  <span className="text-[9px] text-gray-600 block">RECORD</span>
-                  <span className="text-xl text-comic-ink font-bold">{Math.max(score, highScore)}</span>
+                <div className="border-2 border-comic-ink p-1.5 sm:p-2 rounded bg-gray-100">
+                  <span className="text-[8px] sm:text-[9px] text-gray-600 block">RECORD</span>
+                  <span className="text-lg sm:text-xl text-comic-ink font-bold">{Math.max(score, highScore)}</span>
                 </div>
               </div>
 
               {score >= 300 && (
-                <div className="border-2 border-comic-ink bg-neon-yellow p-2 rounded font-bangers text-lg text-comic-ink shadow-comic-sm">
+                <div className="border-2 border-comic-ink bg-marvel-yellow p-1.5 sm:p-2 rounded font-bangers text-base sm:text-lg text-comic-ink shadow-comic-sm">
                   ★ SUPREME CODE LORD BADGE ACHIEVED! ★
                 </div>
               )}
 
               <button
                 onClick={startGame}
-                className="comic-btn w-full py-3 border-4 border-comic-ink bg-neon-magenta text-white font-bangers text-2xl shadow-comic hover:bg-neon-yellow hover:text-comic-ink transition-all flex items-center justify-center gap-2"
+                className="comic-btn w-full py-2.5 sm:py-3 border-3 sm:border-4 border-comic-ink bg-marvel-red text-white font-bangers text-xl sm:text-2xl shadow-comic hover:bg-marvel-yellow hover:text-comic-ink transition-all flex items-center justify-center gap-2"
               >
-                <RotateCcw className="w-6 h-6" />
-                <span>TRY AGAIN [ENTER]</span>
+                <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span>TRY AGAIN [TAP]</span>
               </button>
             </div>
           </div>
         )}
 
-        {/* Mobile / Screen Tap Control Bar */}
-        <div className="mt-4 flex sm:hidden items-center justify-between gap-3">
+        {/* Dedicated Mobile & Tablet Large Tap Control Pad */}
+        <div className="mt-3 block">
           <button
             onClick={handleJump}
-            className="comic-btn w-full py-3 border-3 border-comic-ink bg-neon-cyan text-comic-ink font-bangers text-2xl shadow-comic flex items-center justify-center gap-2"
+            onTouchStart={(e) => {
+              e.preventDefault();
+              handleJump();
+            }}
+            className="comic-btn w-full py-3 sm:py-4 min-h-[52px] border-3 border-comic-ink bg-gradient-to-r from-marvel-yellow via-amber-400 to-marvel-yellow text-comic-ink font-bangers text-xl sm:text-2xl shadow-comic flex items-center justify-center gap-2 active:scale-95"
           >
-            <Zap className="w-6 h-6" />
+            <Zap className="w-6 h-6 text-marvel-red fill-current" />
             <span>TAP TO JUMP / DOUBLE-JUMP</span>
           </button>
+          <div className="text-center font-comic text-[11px] text-gray-500 mt-1">
+            Tip: Double tap to jump higher over multi-spikes!
+          </div>
         </div>
 
       </div>
 
       {/* Unlockable Easter Egg Award Banner */}
       {unlockedGoldBadge && (
-        <div className="mt-8 comic-panel p-6 rounded-2xl bg-gradient-to-r from-amber-500 via-neon-yellow to-amber-600 text-comic-ink border-4 border-comic-ink shadow-comic-lg flex flex-col md:flex-row items-center justify-between gap-6 animate-pulse">
-          <div className="flex items-center gap-4">
-            <div className="border-4 border-comic-ink p-3 rounded-full bg-comic-paper shadow-comic">
-              <Trophy className="w-10 h-10 text-amber-600" />
+        <div className="mt-6 sm:mt-8 comic-panel p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-amber-400 via-marvel-yellow to-amber-500 text-comic-ink border-4 border-comic-ink shadow-comic-lg flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 animate-pulse">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="border-3 sm:border-4 border-comic-ink p-2 sm:p-3 rounded-full bg-comic-paper shadow-comic shrink-0">
+              <Trophy className="w-8 h-8 sm:w-10 sm:h-10 text-amber-700" />
             </div>
             <div>
-              <div className="font-arcade text-xs text-gray-900 uppercase">
+              <div className="font-arcade text-[9px] sm:text-xs text-gray-900 uppercase">
                 SECRET EASTER EGG UNLOCKED!
               </div>
-              <h3 className="font-bangers text-3xl sm:text-4xl leading-none">
+              <h3 className="font-bangers text-2xl sm:text-4xl leading-tight">
                 ★ SUPREME CODE LORD: GOLDEN COMIC BADGE ★
               </h3>
-              <p className="font-comic font-bold text-sm text-gray-800">
-                You successfully crushed technical debt and scored 300+ points in Cyber-Runner!
+              <p className="font-comic font-bold text-xs sm:text-sm text-gray-800">
+                You crushed production debt and scored 300+ points!
               </p>
             </div>
           </div>
@@ -757,7 +757,7 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ theme, onTriggerDecal 
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => soundFx.playVictory()}
-            className="comic-btn px-6 py-3 border-3 border-comic-ink bg-comic-paper text-comic-ink font-bangers text-xl shadow-comic hover:bg-white whitespace-nowrap"
+            className="comic-btn w-full md:w-auto px-5 py-2.5 sm:py-3 border-3 border-comic-ink bg-comic-paper text-comic-ink font-bangers text-lg sm:text-xl shadow-comic hover:bg-white text-center whitespace-nowrap"
           >
             CLAIM TROPHY ON GITHUB
           </a>

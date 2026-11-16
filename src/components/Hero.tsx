@@ -73,13 +73,13 @@ export const Hero: React.FC<HeroProps> = ({
 
             {/* Giant Title Typography */}
             <div>
-              <p className="font-bangers text-xl sm:text-2xl tracking-widest uppercase opacity-90 mb-1">
+              <p className="font-bangers text-lg sm:text-2xl tracking-widest uppercase opacity-90 mb-1">
                 MEET THE FULL-STACK & AI SENTINEL
               </p>
-              <h1 className="font-bangers text-5xl sm:text-7xl xl:text-8xl tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-r from-marvel-red via-marvel-blue to-purple-600 filter drop-shadow-[4px_4px_0px_#111111]">
+              <h1 className="font-bangers text-4xl xs:text-5xl sm:text-7xl xl:text-8xl tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-r from-marvel-red via-marvel-blue to-purple-600 filter drop-shadow-[3px_3px_0px_#111111] sm:drop-shadow-[4px_4px_0px_#111111] break-words">
                 LORDS OF THE CODES
               </h1>
-              <div className="font-bangers text-2xl sm:text-3xl tracking-wide mt-1 text-amber-500">
+              <div className="font-bangers text-xl sm:text-3xl tracking-wide mt-1 text-amber-500">
                 MOHAMMED KAIF ABDUL SALAM TUNGEKAR
               </div>
             </div>
@@ -113,7 +113,7 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
 
             {/* CTA Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-2">
               
               {/* Read Issue Button */}
               <button
@@ -122,9 +122,9 @@ export const Hero: React.FC<HeroProps> = ({
                   onTriggerDecal('OPENING ISSUE #1!');
                   onReadIssue();
                 }}
-                className="comic-btn flex items-center gap-2 px-5 py-3 border-4 border-comic-ink bg-marvel-yellow text-comic-ink font-bangers text-xl sm:text-2xl shadow-comic hover:bg-white transition-all"
+                className="comic-btn min-h-[44px] flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2.5 sm:py-3 border-3 sm:border-4 border-comic-ink bg-marvel-yellow text-comic-ink font-bangers text-lg sm:text-2xl shadow-comic hover:bg-white transition-all flex-grow sm:flex-grow-0"
               >
-                <ArrowDown className="w-5 h-5 animate-bounce" />
+                <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 animate-bounce" />
                 <span>READ ISSUE</span>
               </button>
 
@@ -134,9 +134,9 @@ export const Hero: React.FC<HeroProps> = ({
                   soundFx.playToken();
                   onOpenResume();
                 }}
-                className="comic-btn flex items-center gap-2 px-5 py-3 border-4 border-comic-ink bg-marvel-red text-white font-bangers text-xl sm:text-2xl shadow-comic hover:bg-black transition-all"
+                className="comic-btn min-h-[44px] flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2.5 sm:py-3 border-3 sm:border-4 border-comic-ink bg-marvel-red text-white font-bangers text-lg sm:text-2xl shadow-comic hover:bg-black transition-all flex-grow sm:flex-grow-0"
               >
-                <FileText className="w-5 h-5" />
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>CLASSIFIED RESUME</span>
               </button>
 
@@ -147,9 +147,9 @@ export const Hero: React.FC<HeroProps> = ({
                   onTriggerDecal('ARCADE READY!');
                   onPlayGame();
                 }}
-                className="comic-btn flex items-center gap-2 px-4 py-3 border-3 border-comic-ink bg-emerald-400 text-comic-ink font-bangers text-xl shadow-comic hover:bg-white transition-all"
+                className="comic-btn min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 border-2 sm:border-3 border-comic-ink bg-emerald-400 text-comic-ink font-bangers text-base sm:text-xl shadow-comic hover:bg-white transition-all"
               >
-                <Gamepad2 className="w-5 h-5" />
+                <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>PLAY GAME</span>
               </button>
 
@@ -159,7 +159,7 @@ export const Hero: React.FC<HeroProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => soundFx.playToken()}
-                className="comic-btn flex items-center gap-1.5 px-3.5 py-3 border-3 border-comic-ink bg-blue-600 text-white font-bangers text-lg shadow-comic hover:bg-blue-700"
+                className="comic-btn min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-3 border-2 sm:border-3 border-comic-ink bg-blue-600 text-white font-bangers text-base sm:text-lg shadow-comic hover:bg-blue-700"
                 title="LinkedIn Profile"
               >
                 <ExternalLink className="w-4 h-4" />
@@ -172,7 +172,7 @@ export const Hero: React.FC<HeroProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => soundFx.playToken()}
-                className="comic-btn flex items-center gap-1.5 px-3.5 py-3 border-3 border-comic-ink bg-comic-paper text-comic-ink font-bangers text-lg shadow-comic hover:bg-white"
+                className="comic-btn min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-3 border-2 sm:border-3 border-comic-ink bg-comic-paper text-comic-ink font-bangers text-base sm:text-lg shadow-comic hover:bg-white"
                 title="GitHub Base"
               >
                 <Terminal className="w-4 h-4 text-marvel-red" />
