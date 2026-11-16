@@ -13,6 +13,7 @@ import { EducationFlow } from './components/EducationFlow';
 import { Certifications } from './components/Certifications';
 import { SecretComms } from './components/SecretComms';
 import { ResumeModal } from './components/ResumeModal';
+import { BattleshipScroller } from './components/BattleshipScroller';
 
 export default function App() {
   const [theme, setTheme] = useState<MultiverseTheme>('marvel');
@@ -107,6 +108,12 @@ export default function App() {
         onToggleTheme={handleToggleTheme}
         onJumpToGame={() => scrollToSection('arcade')}
         onOpenResume={() => setIsResumeOpen(true)}
+      />
+
+      {/* Animated Tactical Battleship Altitude Scroller */}
+      <BattleshipScroller
+        theme={theme}
+        onTriggerDecal={triggerDecal}
       />
 
       {/* Main Comic Issue Content */}
